@@ -8,6 +8,7 @@ export interface IMusic extends ITimestamps {
   video_id: string;
   user_id: string;
   show_id: string;
+  position: number;
 }
 
 export interface IGetMusicProps extends IApiRoot {

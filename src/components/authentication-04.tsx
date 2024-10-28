@@ -84,7 +84,7 @@ export default function Dashboard() {
                   className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-              <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded" disabled={isSubmitting}>
+              <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded text-white font-bold" disabled={isSubmitting}>
                 Entrar
               </Button>
             </div>

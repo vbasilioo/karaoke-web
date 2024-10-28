@@ -27,7 +27,7 @@ export default function Home() {
               <h1 className="text-4xl font-bold text-white">Bem vindo ao OPEN MIC</h1>
             </div>
             <div className="grid gap-4">
-              <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded" asChild>
+              <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded text-white font-bold" asChild>
                 <Link href="/create-account/register">
                   Solte a voz e anime sua festa!
                 </Link>
