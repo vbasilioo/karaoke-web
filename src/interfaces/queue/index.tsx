@@ -15,3 +15,8 @@ export interface IQueue extends ITimestamps {
 export interface IGetQueue extends IPaginate {
   data: IQueue[];
 }
+
+export interface IDeleteQueue {
+  id: string;
+  position: number;
+}

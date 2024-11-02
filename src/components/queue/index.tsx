@@ -3,7 +3,9 @@ import { useGetQueue } from "@/hook/queue/use-get-queue";
 export function Queue() {
   const { data } = useGetQueue();
 
-  const sortedQueue = data?.data.sort((a, b) => a.music.position - b.music.position) || [];
+  const sortedQueue = data?.data
+    .filter(item => item.music)
+    .sort((a, b) => a.music.position - b.music.position) || [];
 
   return (
     <div className="p-6 text-center">
