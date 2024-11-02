@@ -12,13 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetUser } from "@/hook/user/use-get-user";
-import { useGetShowByCodeAccess } from "@/hook/show/use-get-show-by-id";
 import { useState } from "react";
 import { IUser } from "@/interfaces/user";
+import { useGetAllUsers } from "@/hook/user/use-get-all-user";
 
 export function Users() {
-
   const [codeAccess, setCodeAccess] = useState<string>("");
 
   const {
@@ -28,19 +26,13 @@ export function Users() {
     reset,
   } = useForm();
 
-  const {
-    data: showById
-  } = useGetShowByCodeAccess(codeAccess);
-
-  const {
-    data: users
-  } = useGetUser(showById?.data.id ?? '');
+  const { data: users } = useGetAllUsers();
 
   const { mutateAsync: storeUser } = useMutation({
     mutationFn: createUser,
     mutationKey: ['create-user'],
     async onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['create-user'] });
+      await queryClient.invalidateQueries({ queryKey: ['get-all-users'] });
       reset();
     },
   });
@@ -88,7 +80,7 @@ export function Users() {
           <p className="text-xl font-medium">Código de Acesso</p>
           <input
             type="text"
-            className={`border p-2 rounded-md w-full ${errors.table ? 'border-red-500' : ''}`}
+            className={`border p-2 rounded-md w-full ${errors.code_access ? 'border-red-500' : ''}`}
             placeholder="Digite o código de acesso da noite"
             {...register("code_access", { required: "Código de acesso é obrigatório." })}
           />
@@ -108,15 +100,13 @@ export function Users() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users?.data.map((user: IUser) => {
-              return (
-                <TableRow key={user.id}>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.telephone}</TableCell>
-                  <TableCell>{user.table}</TableCell>
-                </TableRow>
-              );
-            })}
+            {users?.data.data.map((user: IUser) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.telephone}</TableCell>
+                <TableCell>{user.table}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>

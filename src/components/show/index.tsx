@@ -22,9 +22,7 @@ import { formatFullDate } from "@/lib/utils";
 
 export function Show() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
-
   const { data: shows } = useGetShow();
-
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,7 +30,7 @@ export function Show() {
     mutationFn: createShow,
     mutationKey: ['create-show'],
     async onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['create-show'] });
+      queryClient.invalidateQueries({ queryKey: ['get-show'] });
       reset();
       setIsSubmitting(false);
     }

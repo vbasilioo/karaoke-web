@@ -103,7 +103,7 @@ export function MusicModal({ music, closeModal }: IMusicModalProps) {
                 disabled={!showId}
               >
                 <option value="">Selecione um cliente</option>
-                {users?.data.map((user: IUser) => (
+                {users?.data.data.map((user: IUser) => (
                   <option key={user.id} value={user.id}>
                     {user.username}
                   </option>

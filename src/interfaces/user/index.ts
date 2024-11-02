@@ -1,4 +1,4 @@
-import { IApiRoot, ITimestamps } from "../api"
+import { IApiRoot, IPaginate, ITimestamps } from "../api"
 
 export interface IUser extends ITimestamps {
   username: string
@@ -8,5 +8,7 @@ export interface IUser extends ITimestamps {
 }
 
 export interface IGetUser extends IApiRoot {
-  data: IUser[]
+  data: IPaginate & {
+    data: IUser
+  }
 }
