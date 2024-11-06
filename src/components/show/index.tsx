@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
 import { Loading } from "../global/loading";
-
 import {
   Table,
   TableBody,
@@ -55,11 +54,11 @@ export function Show() {
   };
 
   return (
-    <div className="flex h-screen flex-col items-center justify-start space-y-6 text-center text-sm p-6">
+    <div className="flex flex-col items-center justify-start space-y-6 text-center p-4 md:p-8">
       <form className="flex flex-col space-y-4 w-full max-w-3xl" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
-            <p className="text-xl font-medium">Entre com o nome da noite</p>
+            <p className="text-lg font-medium">Nome da Noite</p>
             <input
               type="text"
               className={`border p-2 rounded-md w-full ${errors.name ? 'border-red-500' : ''}`}
@@ -69,7 +68,7 @@ export function Show() {
           </div>
 
           <div>
-            <p className="text-xl font-medium">Horário de Início</p>
+            <p className="text-lg font-medium">Horário de Início</p>
             <input
               type="time"
               className={`border p-2 rounded-md w-full ${errors.hour_start ? 'border-red-500' : ''}`}
@@ -78,7 +77,7 @@ export function Show() {
           </div>
 
           <div>
-            <p className="text-xl font-medium">Horário de Término</p>
+            <p className="text-lg font-medium">Horário de Término</p>
             <input
               type="time"
               className={`border p-2 rounded-md w-full ${errors.hour_end ? 'border-red-500' : ''}`}
@@ -87,7 +86,7 @@ export function Show() {
           </div>
 
           <div>
-            <p className="text-xl font-medium">Data do Show</p>
+            <p className="text-lg font-medium">Data do Show</p>
             <input
               type="date"
               className={`border p-2 rounded-md w-full ${errors.date_show ? 'border-red-500' : ''}`}
@@ -97,7 +96,7 @@ export function Show() {
         </div>
 
         <div>
-          <p className="text-xl font-medium">Tipo de Show</p>
+          <p className="text-lg font-medium">Tipo de Show</p>
           <select
             className={`border p-2 rounded-md w-full ${errors.type ? 'border-red-500' : ''}`}
             {...register("type", { required: "O tipo de show é obrigatório." })}
@@ -125,12 +124,12 @@ export function Show() {
         </Button>
       </form>
 
-      <div className="w-full min-h-[60vh] overflow-auto">
+      <div className="w-full min-h-[60vh] overflow-x-auto">
         <Table>
           <TableCaption>Lista recente de shows cadastrados.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[220px] text-center">Nome do Show</TableHead>
+              <TableHead className="text-center">Nome do Show</TableHead>
               <TableHead className="text-center">Hora do Início</TableHead>
               <TableHead className="text-center">Hora do Fim</TableHead>
               <TableHead className="text-center">Data do Show</TableHead>
