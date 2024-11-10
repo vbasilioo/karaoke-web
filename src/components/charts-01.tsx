@@ -28,8 +28,8 @@ export default function MusicCharts() {
   const { data } = useGetStats();
 
   const chartData = data?.data.data.map(item => ({
-    name: item.music.name,
-    requests: item.request_count
+    name: item.music?.name || "",
+    requests: item.request_count || 0,
   })) || [];
 
   console.log('chartData: ', chartData);
@@ -107,7 +107,7 @@ export default function MusicCharts() {
               <CardDescription>
                 Nos últimos 7 dias, a música mais solicitada foi:{" "}
                 <span className="font-medium text-foreground">
-                  {chartData[0].name} com {chartData[0].requests} solicitações.
+                  {chartData[0].name || "N/A"} com {chartData[0].requests} solicitações.
                 </span>
               </CardDescription>
             )}

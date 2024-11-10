@@ -55,9 +55,9 @@ export function Show() {
 
   return (
     <div className="flex flex-col items-center justify-start space-y-6 text-center p-4 md:p-8">
-      <form className="flex flex-col space-y-4 w-full max-w-3xl" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div>
+      <form className="flex flex-col space-y-4 w-full max-w-lg mx-auto" onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="w-full">
             <p className="text-lg font-medium">Nome da Noite</p>
             <input
               type="text"
@@ -67,7 +67,7 @@ export function Show() {
             />
           </div>
 
-          <div>
+          <div className="w-full">
             <p className="text-lg font-medium">Horário de Início</p>
             <input
               type="time"
@@ -76,7 +76,7 @@ export function Show() {
             />
           </div>
 
-          <div>
+          <div className="w-full">
             <p className="text-lg font-medium">Horário de Término</p>
             <input
               type="time"
@@ -85,7 +85,7 @@ export function Show() {
             />
           </div>
 
-          <div>
+          <div className="w-full">
             <p className="text-lg font-medium">Data do Show</p>
             <input
               type="date"
@@ -95,7 +95,7 @@ export function Show() {
           </div>
         </div>
 
-        <div>
+        <div className="w-full">
           <p className="text-lg font-medium">Tipo de Show</p>
           <select
             className={`border p-2 rounded-md w-full ${errors.type ? 'border-red-500' : ''}`}
@@ -112,7 +112,7 @@ export function Show() {
           </select>
         </div>
 
-        <Button type="submit" disabled={isSubmitting} className="relative">
+        <Button type="submit" disabled={isSubmitting} className="relative w-full">
           {isSubmitting ? (
             <span className="flex items-center">
               <Loading />
@@ -124,7 +124,7 @@ export function Show() {
         </Button>
       </form>
 
-      <div className="w-full min-h-[60vh] overflow-x-auto">
+      <div className="w-full max-w-4xl min-h-[60vh] overflow-x-auto mx-auto">
         <Table>
           <TableCaption>Lista recente de shows cadastrados.</TableCaption>
           <TableHeader>

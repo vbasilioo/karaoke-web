@@ -113,10 +113,10 @@ export function MusicModal({ music, closeModal }: IMusicModalProps) {
           )}
 
           <div className="flex justify-end gap-4">
-            <Button className="bg-gray-400" type="button" onClick={closeModal}>
+            <Button className="bg-gray-400 text-white font-bold" type="button" onClick={closeModal}>
               Cancelar
             </Button>
-            <Button className="bg-cyan-900" type="submit" disabled={isLoadingShows}>
+            <Button className="bg-cyan-900 text-white font-bold" type="submit" disabled={isLoadingShows}>
               Confirmar
             </Button>
           </div>
