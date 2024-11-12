@@ -92,20 +92,20 @@ export function Users() {
       <div className="flex w-full">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Usuário</TableHead>
-              <TableHead>Telefone</TableHead>
-              <TableHead>Mesa</TableHead>
-              <TableHead>Show</TableHead>
+            <TableRow className="text-center">
+              <TableHead className="text-center">Usuário</TableHead>
+              <TableHead className="text-center">Telefone</TableHead>
+              <TableHead className="text-center">Mesa</TableHead>
+              <TableHead className="text-center">Show</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users?.data.data.map((user: IUser) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.telephone}</TableCell>
-                <TableCell>{user.table}</TableCell>
-                <TableCell>{user.show_id}</TableCell>
+              <TableRow key={user.id} className="text-center">
+                <TableCell className="text-center">{user.username}</TableCell>
+                <TableCell className="text-center">{user.telephone}</TableCell>
+                <TableCell className="text-center">{user.table}</TableCell>
+                <TableCell className="text-center">{user.show.name}</TableCell>
               </TableRow>
             ))}
           </TableBody>

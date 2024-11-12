@@ -18,6 +18,7 @@ import {
 import { useGetShow } from "@/hook/show/use-get-show";
 import { IShow } from "@/interfaces/show";
 import { formatFullDate } from "@/lib/utils";
+import { PaginationFull } from "../pagination";
 
 export function Show() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -126,7 +127,6 @@ export function Show() {
 
       <div className="w-full overflow-x-auto mx-auto">
         <Table>
-          <TableCaption>Lista recente de shows cadastrados.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="text-center">Nome do Show</TableHead>
