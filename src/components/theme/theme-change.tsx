@@ -7,11 +7,11 @@ import {
 import { Moon, Sun } from 'lucide-react'
 
 const LightTheme = () => {
-  return <Sun className='block text-white' size={20} />
+  return <Sun className="block text-gray-900 dark:text-white" size={20} />
 }
 
 const DarkTheme = () => {
-  return <Moon className='block text-white' size={20} />
+  return <Moon className="block text-gray-900 dark:text-white" size={20} />
 }
 
 export const ThemeChanger = () => {
@@ -20,26 +20,26 @@ export const ThemeChanger = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='border-none bg-transparent p-2 focus:outline-none'>
+        <button className="border-none bg-transparent p-2 focus:outline-none">
           {theme === 'light' ? <LightTheme /> : <DarkTheme />}
         </button>
       </PopoverTrigger>
-      <PopoverContent className='flex max-w-36 flex-col gap-3'>
+      <PopoverContent className="flex max-w-36 flex-col gap-3">
         <button
-          className='flex w-full items-center gap-2 border-none bg-transparent p-2 focus:outline-none'
+          className="flex w-full items-center gap-2 border-none bg-transparent p-2 focus:outline-none"
           disabled={theme === 'light'}
           onClick={() => setTheme('light')}
         >
           <LightTheme />
-          <span>Claro</span>
+          <span className="text-gray-900 dark:text-white">Claro</span>
         </button>
         <button
-          className='flex w-full items-center gap-2 border-none bg-transparent p-2 focus:outline-none'
+          className="flex w-full items-center gap-2 border-none bg-transparent p-2 focus:outline-none"
           disabled={theme === 'dark'}
           onClick={() => setTheme('dark')}
         >
           <DarkTheme />
-          <span>Escuro</span>
+          <span className="text-gray-900 dark:text-white">Escuro</span>
         </button>
       </PopoverContent>
     </Popover>

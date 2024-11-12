@@ -89,14 +89,14 @@ export function Users() {
         <Button type="submit">Criar</Button>
       </form>
 
-      <div className="w-full mt-8" style={{ minHeight: '60%' }}>
+      <div className="flex w-full">
         <Table>
-          <TableCaption>Lista de Usuários Cadastrados</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Usuário</TableHead>
               <TableHead>Telefone</TableHead>
               <TableHead>Mesa</TableHead>
+              <TableHead>Show</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -105,6 +105,7 @@ export function Users() {
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.telephone}</TableCell>
                 <TableCell>{user.table}</TableCell>
+                <TableCell>{user.show_id}</TableCell>
               </TableRow>
             ))}
           </TableBody>

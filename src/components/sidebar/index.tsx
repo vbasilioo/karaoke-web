@@ -61,9 +61,15 @@ export function Sidebar() {
             <UserRoundPlus className="h-4 w-4" />
             Fila
           </Link>
-          <Link href="/televisao" className={linkClasses("/televisao")} onClick={() => handleClick("/televisao")}>
-            <Tv2 className="h-4 w-4" />
-            TV
+          <Link href="/televisao" legacyBehavior>
+            <a
+              target="_blank"
+              className={linkClasses("/televisao")}
+              onClick={() => handleClick("/televisao")}
+            >
+              <Tv2 className="h-4 w-4" />
+              TV
+            </a>
           </Link>
         </nav>
       </div>

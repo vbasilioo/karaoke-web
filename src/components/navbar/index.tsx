@@ -78,7 +78,7 @@ export function Navbar() {
             <DropdownMenuItem>Configurações</DropdownMenuItem>
             <DropdownMenuItem>Suporte</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()}>Sair</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "http://localhost:3000" })}>Sair</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

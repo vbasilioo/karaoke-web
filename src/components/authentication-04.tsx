@@ -60,22 +60,13 @@ export default function Dashboard() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="thays.vasquez@gmail.com"
                   required
                   {...register("email")}
                   className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Senha</Label>
-                  <Link
-                    href="/forgot-password"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Esqueceu sua senha?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Senha</Label>
                 <Input
                   id="password"
                   type="password"
@@ -87,6 +78,14 @@ export default function Dashboard() {
               <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded text-white font-bold" disabled={isSubmitting}>
                 Entrar
               </Button>
+              <div className="flex items-center">
+                <Link
+                  href="/forgot-password"
+                  className="ml-auto inline-block text-sm underline"
+                >
+                  Esqueceu sua senha?
+                </Link>
+              </div>
             </div>
           </div>
         </div>

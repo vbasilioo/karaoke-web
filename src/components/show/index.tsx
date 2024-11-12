@@ -124,7 +124,7 @@ export function Show() {
         </Button>
       </form>
 
-      <div className="w-full max-w-4xl min-h-[60vh] overflow-x-auto mx-auto">
+      <div className="w-full overflow-x-auto mx-auto">
         <Table>
           <TableCaption>Lista recente de shows cadastrados.</TableCaption>
           <TableHeader>
