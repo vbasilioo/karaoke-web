@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createShow } from "@/app/api/show/create-show";
 import { toast } from "sonner";
 import { getSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loading } from "../global/loading";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -20,14 +20,22 @@ import { IShow } from "@/interfaces/show";
 import { formatFullDate } from "@/lib/utils";
 
 export function Show() {
-  const session = await getSession();
-  
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
-  const { data: shows } = useGetShow(session?.admin.id);
-  const queryClient = useQueryClient();
+  const [session, setSession] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setSession(sessionData);
+    };
+    fetchSession();
+  }, []);
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const queryClient = useQueryClient();
+  const { data: shows } = useGetShow(session?.admin?.id ?? "");
+  
   const { mutateAsync: storeShow } = useMutation({
     mutationFn: createShow,
     mutationKey: ['create-show'],
@@ -40,12 +48,13 @@ export function Show() {
   });
 
   const onSubmit = async (data: any) => {
-    setIsSubmitting(true);
+    if (!session?.admin?.id) {
+      toast.error("Admin ID is missing.");
+      return;
+    }
 
-    const showData = {
-      ...data,
-      admin_id: session?.admin.id,
-    };
+    setIsSubmitting(true);
+    const showData = { ...data, admin_id: session.admin.id };
 
     try {
       await storeShow(showData);
