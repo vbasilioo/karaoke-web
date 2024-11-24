@@ -21,3 +21,15 @@ export interface IGetShowByCodeAccess extends IApiRoot {
 export interface IGetShowProps extends IApiRoot {
   data: IShow[]
 }
+
+export interface IDeleteShow {
+  id: string;
+}
+
+export interface IRestoreShow {
+  id: string;
+}
+
+export interface IUpdateShowProps extends IApiRoot {
+  data: IShow;
+}

@@ -25,7 +25,7 @@ const nextAuthOptions: NextAuthOptions = {
           if (!admin || !token) throw new Error('Falha na autenticação: falta de dados do administrador ou do token.');
 
           return { ...admin, token };
-        }catch(error: any){
+        } catch (error: any) {
           console.error('Erro na função de autorização:', error);
           if (error.response && error.response.data && error.response.data.message) {
             throw new Error(error.response.data.message);
@@ -39,7 +39,9 @@ const nextAuthOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.admin = user as IAdministrator;
-        token.token = (user as any).token;
+        token.token = (user as any).token as string;
+
+        token.role = user.email ? 'admin' : 'temporaryUser';
       }
 
       return token;
@@ -48,9 +50,10 @@ const nextAuthOptions: NextAuthOptions = {
       if (token.admin) {
         session.admin = token.admin;
       }
-      if (token.token) {
-        session.token = token.token;
-      }
+
+      session.token = token.token as string;
+      session.role = token.role;
+
       return session;
     },
   },

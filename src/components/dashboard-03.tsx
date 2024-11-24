@@ -5,10 +5,23 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import { useDestroyQueue } from "@/hook/queue/use-destroy-queue";
 import { queryClient } from "@/lib/react-query";
+import { useEffect, useState } from "react";
+import { getSession } from "next-auth/react";
 
 export default function Dashboard() {
+
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setSession(sessionData);
+    };
+    fetchSession();
+  }, []);
+
   const { data: nextMusicData } = useNextMusic();
-  const { data: getQueueData } = useGetQueue();
+  const { data: getQueueData } = useGetQueue(session?.admin?.id ?? '');
   const { mutate: removeFromQueue } = useDestroyQueue();
 
   const handleRemoveFromQueue = (userId: string, position: number) => {
@@ -16,7 +29,7 @@ export default function Dashboard() {
       { id: userId, position },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['get-queue'] });
+          queryClient.invalidateQueries({ queryKey: ['get-queue', 'store-music'] });
         },
       }
     );

@@ -52,6 +52,12 @@ export function Music() {
 
   return (
     <div className="flex flex-col items-center mt-10">
+      <div className="justify-center text-center mb-6">
+        <h1 className="text-4xl font-bold text-center dark:text-white text-black mb-2">
+          Bem-vindo ao OpenMic.
+        </h1>
+        <h4 className="text-2xl font-medium text-center dark:text-white text-black">Pesquise uma música para você cantar.</h4>
+      </div>
       <div className="relative w-96 mb-10">
         <input
           type="text"
@@ -95,7 +101,7 @@ export function Music() {
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-600">Nenhuma música encontrada.</p>
+        <p className="text-center text-gray-600">Nenhuma música pesquisada.</p>
       )}
 
       {isModalOpen && selectedMusic && (

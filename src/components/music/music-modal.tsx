@@ -11,7 +11,8 @@ import { formatFullDate } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { useGetUser } from "@/hook/user/use-get-user";
 import { IUser } from "@/interfaces/user";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSession } from "next-auth/react";
 
 interface IMusicModalProps {
   music: {
@@ -35,9 +36,18 @@ interface IFormInput {
 }
 
 export function MusicModal({ music, closeModal }: IMusicModalProps) {
-  const { data: shows, isLoading: isLoadingShows } = useGetShow();
+  const [session, setSession] = useState<any>(null);
+  const { data: shows, isLoading: isLoadingShows } = useGetShow(session?.admin?.id ?? "");
   const [showId, setShowId] = useState("");
-  const { data: users } = useGetUser(showId);
+  const { data: users } = useGetUser(showId, session?.admin?.id ?? "");
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setSession(sessionData);
+    };
+    fetchSession();
+  }, []);
 
   const {
     register,
@@ -53,7 +63,7 @@ export function MusicModal({ music, closeModal }: IMusicModalProps) {
     mutationKey: ['store-music'],
     async onSuccess() {
       await adjustQueue();
-      queryClient.invalidateQueries({ queryKey: ['store-music'] });
+      queryClient.invalidateQueries({ queryKey: ['store-music', 'get-queue'] });
       reset();
       closeModal();
     },
