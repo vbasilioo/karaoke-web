@@ -27,3 +27,15 @@ export interface IGetUser extends IApiRoot {
     data: IUser
   }
 }
+
+interface MyUser extends ITimestamps {
+  username: string
+  telephone: string
+  table: number
+  show_id: string
+  admin_id: any
+}
+
+export interface IMeUser extends IApiRoot {
+  data: MyUser[];
+}

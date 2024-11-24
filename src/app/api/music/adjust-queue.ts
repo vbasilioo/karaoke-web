@@ -12,7 +12,6 @@ export async function adjustQueue(){
       'Error fetching data:',
       error.response?.data || error.message || error,
     );
-    if (error.response.data.message) toast.error(error.response.data.message);
 
     throw new Error(error.response?.data.message || 'Error fetching data');
   }

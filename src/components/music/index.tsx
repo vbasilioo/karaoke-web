@@ -1,51 +1,165 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { searchMusic } from "@/app/api/music/search-music";
-import { ISearchRoot, ISearchYoutubeMusic } from "@/interfaces/music";
-import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Loader, Search } from "lucide-react";
 import { z } from "zod";
 import { useSearchMusic } from "@/hook/music/use-search-music";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Loading } from "../global/loading";
 import { Error } from "../global/error";
-import { MusicModal } from "./music-modal";
+import { useGetMe } from "@/hook/user/use-get-me";
+import { Search } from "lucide-react";
+import { toast } from "sonner";
+import { queryClient } from "@/lib/react-query";
+import { adjustQueue } from "@/app/api/music/adjust-queue";
+import { useMutation } from "@tanstack/react-query";
+import { storeMusic } from "@/app/api/music/store-music";
+import { useForm } from "react-hook-form";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "../ui/dialog";
+
+interface MusicSnippet {
+  title: string;
+  description: string;
+  channelTitle: string;
+  thumbnails: {
+    high: {
+      url: string;
+    };
+    default: {
+      url: string;
+    };
+  };
+}
+
+interface MusicItem {
+  snippet: MusicSnippet;
+  id: {
+    videoId: string;
+  };
+}
+
+interface IFormInput {
+  showId: string;
+  userId: string;
+}
 
 export function Music() {
   const [searchInput, setSearchInput] = useState("");
-  const [selectedMusic, setSelectedMusic] = useState(null);
+  const [selectedMusic, setSelectedMusic] = useState<MusicItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isModalLoading, setIsModalLoading] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const userId = searchParams.get("temporaryUser");
 
   const search = z.string().parse(searchParams.get("search") ?? "");
 
   const { data: musics, isLoading, isError } = useSearchMusic({
     search,
     page: 1,
-    per_page: 9
+    per_page: 9,
+  });
+
+  const { data: userme, isLoading: isUserLoading } = useGetMe(userId ?? "");
+
+  useEffect(() => {
+    if (userme) {
+      setIsLoadingData(false);
+    }
+  }, [userme]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<IFormInput>();
+
+  const { mutateAsync: createMusic } = useMutation({
+    mutationFn: storeMusic,
+    mutationKey: ["store-music"],
+    async onSuccess() {
+      await adjustQueue();
+      queryClient.invalidateQueries({ queryKey: ["store-music", "get-queue"] });
+      reset();
+    },
+    onError: (error: any) => {
+      setIsModalLoading(false);
+      setIsModalOpen(false);
+      setTimeout(() => setIsModalOpen(true), 50);
+    },
   });
 
   const handleSearch = () => {
     if (searchInput.trim()) {
-      router.push(`?search=${searchInput}`);
+      const currentParams = new URLSearchParams(searchParams.toString());
+      if (userId) {
+        currentParams.set('temporaryUser', userId);
+      }
+      currentParams.set('search', searchInput);
+      router.push(`?${currentParams.toString()}`);
     }
   };
 
-  if(isLoading) return <Loading />;
+  if (isLoading || isUserLoading || isLoadingData) return <Loading />;
 
-  if(isError) return <Error title="Falha ao encontrar música." description="Não foi possível encontrar a música pesquisada." />;
+  if (isError)
+    return (
+      <Error
+        title="Falha ao encontrar música."
+        description="Não foi possível encontrar a música pesquisada."
+      />
+    );
 
-  const openModal = (music: any) => {
-    setSelectedMusic(music);
-    setIsModalOpen(true);
+  const handleCantarClick = (music: MusicItem) => {
+    if (userme) {
+      setSelectedMusic(music);
+      setIsModalOpen(true);
+    } else {
+      toast.error("Os dados do usuário ainda não estão disponíveis.");
+    }
   };
 
-  const closeModal = () => {
+  const handleConfirm = async () => {
+    if (!selectedMusic || !userme) return;
+
+    const userData = userme.data[0];
+    if (!userData || !userData.id || !userData.show_id) {
+      toast.error("Dados do usuário incompletos.");
+      return;
+    }
+
+    const userId = userData.id;
+    const showId = userData.show_id;
+
+    const musicData = new FormData();
+    musicData.append("name", selectedMusic.snippet.title);
+    musicData.append("description", selectedMusic.snippet.description);
+    musicData.append("video_id", selectedMusic.id.videoId);
+    musicData.append("user_id", userId);
+    musicData.append("show_id", showId);
+
+    setIsModalLoading(true);
+
+    await createMusic(musicData);
+
+    setIsModalOpen(false);
+    setSelectedMusic(null);
+    setIsModalLoading(false);
+  };
+
+  const handleCancel = () => {
     setIsModalOpen(false);
     setSelectedMusic(null);
   };
@@ -56,7 +170,9 @@ export function Music() {
         <h1 className="text-4xl font-bold text-center dark:text-white text-black mb-2">
           Bem-vindo ao OpenMic.
         </h1>
-        <h4 className="text-2xl font-medium text-center dark:text-white text-black">Pesquise uma música para você cantar.</h4>
+        <h4 className="text-2xl font-medium text-center dark:text-white text-black">
+          Pesquise uma música para você cantar.
+        </h4>
       </div>
       <div className="relative w-96 mb-10">
         <input
@@ -73,10 +189,13 @@ export function Music() {
         />
       </div>
 
-      {musics?.data && musics?.data?.items?.length > 0 ? (
+      {musics?.data && musics.data.items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {musics.data.items.map((music, index: number) => (
-            <div key={index} className="border rounded-lg p-4 flex flex-col items-center text-center">
+          {musics.data.items.map((music, index) => (
+            <div
+              key={index}
+              className="border rounded-lg p-4 flex flex-col items-center text-center"
+            >
               <Image
                 src={music.snippet.thumbnails.high.url ?? music.snippet.thumbnails.default.url}
                 alt={music.snippet.title}
@@ -93,7 +212,7 @@ export function Music() {
               </p>
               <Button
                 className="mt-2 bg-cyan-900 w-full font-bold dark:font-bold dark:text-white"
-                onClick={() => openModal(music)}
+                onClick={() => handleCantarClick(music)}
               >
                 Cantar
               </Button>
@@ -104,9 +223,28 @@ export function Music() {
         <p className="text-center text-gray-600">Nenhuma música pesquisada.</p>
       )}
 
-      {isModalOpen && selectedMusic && (
-        <MusicModal music={selectedMusic} closeModal={closeModal} />
-      )}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmação</DialogTitle>
+            <DialogDescription>
+              Você deseja cantar "{selectedMusic?.snippet.title}"?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="bg-green-600 text-white mr-2"
+              onClick={handleConfirm}
+              disabled={isModalLoading}
+            >
+              {isModalLoading ? "Carregando..." : "Confirmar"}
+            </Button>
+            <Button className="bg-red-600 text-white" onClick={handleCancel}>
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,33 +1,35 @@
-import { adjustQueue } from "@/app/api/music/adjust-queue";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
 import { storeMusic } from "@/app/api/music/store-music";
-import { useGetShow } from "@/hook/show/use-get-show";
-import { IShow } from "@/interfaces/show";
-import { Loading } from "../global/loading";
-import { formatFullDate } from "@/lib/utils";
-import { Separator } from "../ui/separator";
-import { useGetUser } from "@/hook/user/use-get-user";
-import { IUser } from "@/interfaces/user";
-import { useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { adjustQueue } from "@/app/api/music/adjust-queue";
+import { Button } from "../ui/button";
 
 interface IMusicModalProps {
   music: {
     snippet: {
       title: string;
       description: string;
-      video_id: string;
-      user_id: string;
-      show_id: string;
     };
     id: {
       videoId: string;
     };
   };
   closeModal: () => void;
+  showId: string;
+  userId: string;
 }
 
 interface IFormInput {
@@ -35,19 +37,8 @@ interface IFormInput {
   userId: string;
 }
 
-export function MusicModal({ music, closeModal }: IMusicModalProps) {
-  const [session, setSession] = useState<any>(null);
-  const { data: shows, isLoading: isLoadingShows } = useGetShow(session?.admin?.id ?? "");
-  const [showId, setShowId] = useState("");
-  const { data: users } = useGetUser(showId, session?.admin?.id ?? "");
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const sessionData = await getSession();
-      setSession(sessionData);
-    };
-    fetchSession();
-  }, []);
+export function MusicModal({ music, closeModal, showId, userId }: IMusicModalProps) {
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   const {
     register,
@@ -72,66 +63,41 @@ export function MusicModal({ music, closeModal }: IMusicModalProps) {
     },
   });
 
-  const onSubmit = async (data: IFormInput) => {
+  const onSubmit = async () => {
     const musicData = new FormData();
     musicData.append('name', music.snippet.title);
     musicData.append('description', music.snippet.description);
     musicData.append('video_id', music.id.videoId);
-    musicData.append('user_id', data.userId);
-    musicData.append('show_id', data.showId);
+    musicData.append('user_id', userId);
+    musicData.append('show_id', showId);
 
     await createMusic(musicData);
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-4">Cantar: {music.snippet.title}</h2>
-        <p className="text-gray-500 mb-4">Descrição: {music.snippet.description}</p>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {isLoadingShows ? (
-            <Loading />
-          ) : (
-            <div>
-              <select
-                {...register("showId", { required: "Selecione um show" })}
-                className="border p-2 mb-4 w-full rounded"
-                onChange={(e) => setShowId(e.target.value)}
-              >
-                <option value="">Selecione um show</option>
-                {shows?.data.map((show: IShow) => (
-                  <option key={show.id} value={show.id}>
-                    {show.name} - {formatFullDate(show.date_show)}
-                  </option>
-                ))}
-              </select>
-              <Separator />
-              <select
-                {...register("userId", { required: "Selecione um cliente" })}
-                className="border p-2 mb-4 mt-4 w-full rounded"
-                disabled={!showId}
-              >
-                <option value="">Selecione um cliente</option>
-                {users?.data.data.map((user: IUser) => (
-                  <option key={user.id} value={user.id}>
-                    {user.username}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="flex justify-end gap-4">
-            <Button className="bg-gray-400 text-white font-bold" type="button" onClick={closeModal}>
-              Cancelar
-            </Button>
-            <Button className="bg-cyan-900 text-white font-bold" type="submit" disabled={isLoadingShows}>
-              Confirmar
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <>
+      <AlertDialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
+        <AlertDialogTrigger asChild>
+          <Button
+            className="mt-2 bg-cyan-900 w-full font-bold dark:font-bold dark:text-white"
+            onClick={() => setIsConfirmationOpen(true)}
+          >
+            Cantar
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem certeza que deseja cantar a música "{music.snippet.title}"?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsConfirmationOpen(false)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={onSubmit}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
