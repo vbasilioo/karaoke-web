@@ -7,10 +7,15 @@ import { useDestroyQueue } from "@/hook/queue/use-destroy-queue";
 import { queryClient } from "@/lib/react-query";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
+import ws from "@/app/services/websocket";
 
 export default function Dashboard() {
 
   const [session, setSession] = useState<any>(null);
+
+  ws.channel('add-music').listen('AddMusicEvent', (e: any) => {
+    console.log(e);
+  });
 
   useEffect(() => {
     const fetchSession = async () => {

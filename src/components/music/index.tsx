@@ -56,7 +56,6 @@ export function Music() {
   const [searchInput, setSearchInput] = useState("");
   const [selectedMusic, setSelectedMusic] = useState<MusicItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true);
   const [isModalLoading, setIsModalLoading] = useState(false);
 
   const router = useRouter();
@@ -73,12 +72,6 @@ export function Music() {
 
   const { data: userme, isLoading: isUserLoading } = useGetMe(userId ?? "");
 
-  useEffect(() => {
-    if (userme) {
-      setIsLoadingData(false);
-    }
-  }, [userme]);
-
   const {
     register,
     handleSubmit,
@@ -94,7 +87,7 @@ export function Music() {
       queryClient.invalidateQueries({ queryKey: ["store-music", "get-queue"] });
       reset();
     },
-    onError: (error: any) => {
+    onError: () => {
       setIsModalLoading(false);
       setIsModalOpen(false);
       setTimeout(() => setIsModalOpen(true), 50);
@@ -112,22 +105,15 @@ export function Music() {
     }
   };
 
-  if (isLoading || isUserLoading || isLoadingData) return <Loading />;
-
-  if (isError)
-    return (
-      <Error
-        title="Falha ao encontrar música."
-        description="Não foi possível encontrar a música pesquisada."
-      />
-    );
-
   const handleCantarClick = (music: MusicItem) => {
-    if (userme) {
-      setSelectedMusic(music);
-      setIsModalOpen(true);
-    } else {
-      toast.error("Os dados do usuário ainda não estão disponíveis.");
+    setSelectedMusic(music);
+    setIsModalOpen(true);
+
+    if (!userme && !isUserLoading) {
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setTimeout(() => setIsModalOpen(true), 1000);
+      }, 100);
     }
   };
 
@@ -225,24 +211,30 @@ export function Music() {
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmação</DialogTitle>
-            <DialogDescription>
-              Você deseja cantar "{selectedMusic?.snippet.title}"?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              className="bg-green-600 text-white mr-2"
-              onClick={handleConfirm}
-              disabled={isModalLoading}
-            >
-              {isModalLoading ? "Carregando..." : "Confirmar"}
-            </Button>
-            <Button className="bg-red-600 text-white" onClick={handleCancel}>
-              Cancelar
-            </Button>
-          </DialogFooter>
+          {isUserLoading ? (
+            <Loading />
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Confirmação</DialogTitle>
+                <DialogDescription>
+                  Você deseja cantar "{selectedMusic?.snippet.title}"?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  className="bg-green-600 text-white mr-2"
+                  onClick={handleConfirm}
+                  disabled={isModalLoading}
+                >
+                  {isModalLoading ? "Carregando..." : "Confirmar"}
+                </Button>
+                <Button className="bg-red-600 text-white" onClick={handleCancel}>
+                  Cancelar
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

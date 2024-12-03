@@ -214,6 +214,7 @@ export function Show() {
             <TableHead className="text-center">Data</TableHead>
             <TableHead className="text-center">Hora Início</TableHead>
             <TableHead className="text-center">Hora Fim</TableHead>
+            <TableHead className="text-center">Código de Acesso</TableHead>
             <TableHead className="text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -224,6 +225,7 @@ export function Show() {
               <TableCell className="text-center">{formatFullDate(show.date_show)}</TableCell>
               <TableCell className="text-center">{show.hour_start}</TableCell>
               <TableCell className="text-center">{show.hour_end}</TableCell>
+              <TableCell className="text-center">{show.code_access}</TableCell>
               <TableCell className="flex justify-center space-x-2">
                 {show.deleted_at === null && (
                   <Button onClick={() => handleEdit(show)} variant="link" size="icon">
