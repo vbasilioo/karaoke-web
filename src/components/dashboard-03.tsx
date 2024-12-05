@@ -8,14 +8,28 @@ import { queryClient } from "@/lib/react-query";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
 import ws from "@/app/services/websocket";
+import { toast } from "sonner";
+import { IQueue } from "@/interfaces/queue";
+import useWebSocketHook from "@/app/services/websocket";
 
 export default function Dashboard() {
 
   const [session, setSession] = useState<any>(null);
+  const ws = useWebSocketHook();
 
-  ws.channel('add-music').listen('AddMusicEvent', (e: any) => {
-    console.log(e);
-  });
+  useEffect(() => {
+    if(ws){
+      ws.channel('add-music').listen('AddMusicEvent', (e: any) => {
+        if (e.orderQueue.length > 0) {
+          const lastMusic = e.orderQueue[e.orderQueue.length - 1];
+          toast.success(`A música "${lastMusic?.name}" foi adicionada.`, { id: 'newMusic' });
+          console.log("websocket é zika")
+        }
+    
+        queryClient.invalidateQueries({ queryKey: ['get-queue'] });
+      });
+    }
+  }, [ws]);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -34,17 +48,16 @@ export default function Dashboard() {
       { id: userId, position },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['get-queue', 'store-music'] });
+          queryClient.invalidateQueries({ queryKey: ['get-queue'] });
         },
       }
     );
   };
 
-  const sortedQueue = getQueueData?.data
+  /*const sortedQueue = getQueueData?.data
     ?.filter(item => item.music && item.music.position !== null)
-    .sort((a, b) => a.music.position - b.music.position) || [];
-
-  const firstMusicInQueue = sortedQueue.length > 0 ? sortedQueue[0].music : null;
+    .sort((a, b) => a.music.position - b.music.position) || [];*/
+  const firstMusicInQueue = getQueueData && getQueueData?.data?.length > 0 ? getQueueData?.data[0].music : null;
 
   return (
     <div className="grid h-screen w-full pl-[56px] bg-zinc-900">
@@ -77,7 +90,7 @@ export default function Dashboard() {
           <div className="flex flex-col rounded-xl bg-zinc-800 p-4 lg:col-span-1">
             <h3 className="text-lg font-bold mb-2 text-white">Fila de Pessoas</h3>
             <div className="flex flex-col space-y-2">
-              {sortedQueue.map(item => (
+              {getQueueData && getQueueData.data.filter(item => item.music && item.music.position !== null).sort((a, b) => a.music.position - b.music.position).map((item: IQueue) => (
                 <div key={item.id} className="flex items-center justify-between p-2 rounded bg-zinc-700">
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-blue-300 mr-2" />
