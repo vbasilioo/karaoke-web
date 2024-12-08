@@ -23,7 +23,6 @@ export default function Dashboard() {
         if (e.orderQueue.length > 0) {
           const lastMusic = e.orderQueue[e.orderQueue.length - 1];
           toast.success(`A música "${lastMusic?.name}" foi adicionada.`, { id: 'newMusic' });
-          console.log("websocket é zika")
         }
     
         queryClient.invalidateQueries({ queryKey: ['get-queue'] });
