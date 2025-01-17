@@ -27,12 +27,10 @@ import { useGetStats } from "@/hook/stats/use-get-stats"
 export default function MusicCharts() {
   const { data } = useGetStats();
 
-  const chartData = data?.data.data.map(item => ({
+  const chartData = data?.data.data.map((item: { music: { name: any }; request_count: any }) => ({
     name: item.music?.name || "",
     requests: item.request_count || 0,
   })) || [];
-
-  console.log('chartData: ', chartData);
 
   return (
     <div className="chart-wrapper mx-auto flex max-w-6xl flex-col flex-wrap items-start justify-center gap-6 p-6 sm:flex-row sm:p-8">
