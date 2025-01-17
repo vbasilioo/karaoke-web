@@ -16,11 +16,16 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useState, useRef } from "react";
+import QRCode from "react-qr-code";
+
+const QRScanner: any = require('react-qr-scanner');
 
 export default function LoginForm() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [isFieldsEnabled, setIsFieldsEnabled] = useState(false);
 
   const {
     register,
@@ -35,8 +40,8 @@ export default function LoginForm() {
     mutationFn: createUser,
     mutationKey: ['create-user'],
     async onSuccess(data) {
-      if(data){
-        console.log('data data: ', data.data)
+      if (data) {
+        console.log('data data: ', data.data);
         queryClient.invalidateQueries({ queryKey: ['create-user'] });
         router.push(`/musica?temporaryUser=${data.data.id}`);
         reset();
@@ -86,68 +91,68 @@ export default function LoginForm() {
     }
   };
 
+  const handleScan = (data: string | null) => {
+    if (data) {
+      setQrCodeData(data);
+      setIsFieldsEnabled(true);
+    }
+  };
+
+  const handleError = (err: any) => {
+    console.error(err);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Entrar</CardTitle>
           <CardDescription className="text-center">
-            Entre com um nome de usuário temporário e tire uma foto.
+            Leia o QR Code para liberar os campos de entrada.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">Nome</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Thays"
-                {...register("username", { required: "Nome é obrigatório" })}
-              />
-
-              <Label htmlFor="table">Mesa</Label>
-              <Input
-                id="table"
-                type="number"
-                placeholder="10"
-                {...register("table", { required: "Mesa é obrigatória" })}
-              />
-
-              <Label htmlFor="telephone">Telefone</Label>
-              <Input
-                id="telephone"
-                type="text"
-                placeholder="(12) 99999-9999"
-                {...register("telephone")}
-              />
-
-              <Label htmlFor="code_access">Código de acesso</Label>
-              <Input
-                id="code_access"
-                type="password"
-                placeholder="123456"
-                {...register("code_access", { required: "Código de acesso é obrigatório" })}
-              />
-
-              {/*<Label>Foto</Label>
-              {photo ? (
-                <img src={photo} alt="User Photo" className="rounded-md border w-full" />
-              ) : (
-                <Button type="button" onClick={handleTakePhoto} className="w-full bg-blue-500 text-white">
-                  Tirar Foto
-                </Button>
-              )}
-              
-              {cameraActive && (
-                <div>
-                  <video ref={videoRef} autoPlay className="w-full rounded-md" />
-                  <Button type="button" onClick={capturePhoto} className="w-full mt-2 bg-green-500 text-white">
-                    Capturar
-                  </Button>
-                </div>
-              )}*/}
+            <div className="flex justify-center mt-4">
+              <QRCode value={qrCodeData || "OpenMic"} size={128} />
             </div>
+
+            <div className="flex justify-center">
+              <QRScanner
+                delay={300}
+                style={{ width: "100%" }}
+                onError={handleError}
+                onScan={handleScan}
+              />
+            </div>
+
+            {isFieldsEnabled && (
+              <div className="grid gap-2">
+                <Label htmlFor="username">Nome</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Thays"
+                  {...register("username", { required: "Nome é obrigatório" })}
+                />
+
+                <Label htmlFor="table">Mesa</Label>
+                <Input
+                  id="table"
+                  type="number"
+                  placeholder="10"
+                  {...register("table", { required: "Mesa é obrigatória" })}
+                />
+
+                <Label htmlFor="telephone">Telefone</Label>
+                <Input
+                  id="telephone"
+                  type="text"
+                  placeholder="(12) 99999-9999"
+                  {...register("telephone")}
+                />
+              </div>
+            )}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full">Entrar</Button>
