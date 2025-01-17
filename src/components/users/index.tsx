@@ -71,7 +71,7 @@ export function Users() {
                 <p className="text-xl font-medium">Nome de Usuário</p>
                 <input
                   type="text"
-                  className={`border p-2 rounded-md w-full ${errors.username ? 'border-red-500' : ''} bg-white text-black dark:text-white`}
+                  className={`border p-2 rounded-md w-full ${errors.username ? 'border-red-500' : ''} bg-white text-black dark:text-black`}
                   placeholder="Digite o nome de usuário"
                   {...register("username", { required: "Nome de usuário é obrigatório." })}
                 />
@@ -80,7 +80,7 @@ export function Users() {
                 <p className="text-xl font-medium">Telefone</p>
                 <input
                   type="tel"
-                  className={`border p-2 rounded-md w-full ${errors.telephone ? 'border-red-500' : ''} bg-white text-black dark:text-white`}
+                  className={`border p-2 rounded-md w-full ${errors.telephone ? 'border-red-500' : ''} bg-white text-black dark:text-black`}
                   placeholder="Digite o telefone"
                   {...register("telephone", { required: "Telefone é obrigatório." })}
                 />
@@ -89,7 +89,7 @@ export function Users() {
                 <p className="text-xl font-medium">Mesa</p>
                 <input
                   type="text"
-                  className={`border p-2 rounded-md w-full ${errors.table ? 'border-red-500' : ''} bg-white text-black dark:text-white`}
+                  className={`border p-2 rounded-md w-full ${errors.table ? 'border-red-500' : ''} bg-white text-black dark:text-black`}
                   placeholder="Digite o número da mesa"
                   {...register("table", { required: "Mesa é obrigatória." })}
                 />
@@ -98,13 +98,20 @@ export function Users() {
                 <p className="text-xl font-medium">Código de Acesso</p>
                 <input
                   type="text"
-                  className={`border p-2 rounded-md w-full ${errors.code_access ? 'border-red-500' : ''} bg-white text-black dark:text-white`}
+                  className={`border p-2 rounded-md w-full ${errors.code_access ? 'border-red-500' : ''} bg-white text-black dark:text-black`}
                   placeholder="Digite o código de acesso da noite"
                   {...register("code_access", { required: "Código de acesso é obrigatório." })}
                 />
               </div>
               <div className="flex justify-between space-x-4">
-                <Button onClick={() => reset()} type="button" className="w-full bg-red-600 text-white font-bold">
+                <Button
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    reset();
+                  }}
+                  type="button"
+                  className="w-full bg-red-600 text-white font-bold"
+                >
                   Cancelar
                 </Button>
                 <Button type="submit" className="w-full font-bold bg-green-600 text-white">

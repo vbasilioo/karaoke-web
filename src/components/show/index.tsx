@@ -220,7 +220,6 @@ export function Show() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* Verifique se 'shows?.data' existe e tem elementos */}
           {shows?.data && shows.data.length > 0 ? (
             shows.data.map((show) => (
               <TableRow key={show.id} className={show.deleted_at ? 'bg-red-700' : 'bg-green-700'}>
