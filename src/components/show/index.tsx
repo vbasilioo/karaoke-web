@@ -32,6 +32,7 @@ export function Show() {
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await getSession();
+      console.log(sessionData);
       setSession(sessionData);
     };
 
@@ -219,32 +220,41 @@ export function Show() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {shows?.data.map((show) => (
-            <TableRow key={show.id} className={show.deleted_at ? 'bg-red-700' : 'bg-green-700'}>
-              <TableCell className="text-center">{show.name}</TableCell>
-              <TableCell className="text-center">{formatFullDate(show.date_show)}</TableCell>
-              <TableCell className="text-center">{show.hour_start}</TableCell>
-              <TableCell className="text-center">{show.hour_end}</TableCell>
-              <TableCell className="text-center">{show.code_access}</TableCell>
-              <TableCell className="flex justify-center space-x-2">
-                {show.deleted_at === null && (
-                  <Button onClick={() => handleEdit(show)} variant="link" size="icon">
-                    <Edit size={16} />
-                  </Button>
-                )}
-                {show.deleted_at !== null && (
-                  <Button onClick={() => handleRestore(show.id)} variant="link" size="icon">
-                    <RefreshCcw size={16} />
-                  </Button>
-                )}
-                {show.deleted_at === null && (
-                  <Button onClick={() => handleDelete(show.id)} variant="link" size="icon">
-                    <Trash2 size={16} />
-                  </Button>
-                )}
+          {/* Verifique se 'shows?.data' existe e tem elementos */}
+          {shows?.data && shows.data.length > 0 ? (
+            shows.data.map((show) => (
+              <TableRow key={show.id} className={show.deleted_at ? 'bg-red-700' : 'bg-green-700'}>
+                <TableCell className="text-center">{show.name}</TableCell>
+                <TableCell className="text-center">{formatFullDate(show.date_show)}</TableCell>
+                <TableCell className="text-center">{show.hour_start}</TableCell>
+                <TableCell className="text-center">{show.hour_end}</TableCell>
+                <TableCell className="text-center">{show.code_access}</TableCell>
+                <TableCell className="flex justify-center space-x-2">
+                  {show.deleted_at === null && (
+                    <Button onClick={() => handleEdit(show)} variant="link" size="icon">
+                      <Edit size={16} />
+                    </Button>
+                  )}
+                  {show.deleted_at !== null && (
+                    <Button onClick={() => handleRestore(show.id)} variant="link" size="icon">
+                      <RefreshCcw size={16} />
+                    </Button>
+                  )}
+                  {show.deleted_at === null && (
+                    <Button onClick={() => handleDelete(show.id)} variant="link" size="icon">
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center text-gray-500">
+                Nenhum show cadastrado ainda.
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>
