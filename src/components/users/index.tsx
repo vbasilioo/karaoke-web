@@ -17,6 +17,7 @@ import { IUser } from "@/interfaces/user";
 import { useGetAllUsers } from "@/hook/user/use-get-all-user";
 import { getSession } from "next-auth/react";
 import { Trash2, RefreshCcw } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 export function Users() {
   const [session, setSession] = useState<any>(null);
@@ -135,41 +136,68 @@ export function Users() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users?.data.data.map((user: IUser) => (
-              <TableRow
-                key={user.id}
-                className={`text-center ${user.deleted_at ? 'bg-red-500' : 'bg-green-500'} font-bold`}
-              >
-                <TableCell className="text-center">{user.username}</TableCell>
-                <TableCell className="text-center">{user.telephone}</TableCell>
-                <TableCell className="text-center">{user.table}</TableCell>
-                <TableCell className="text-center">{user.show.name}</TableCell>
-                <TableCell className="text-center">
-                  <div className="flex justify-center gap-2">
+            {users?.data?.data && users.data.data.length > 0 ? (
+              users.data.data.map((user: IUser) => (
+                <TableRow
+                  key={user.id}
+                  className={`text-center ${user.deleted_at ? 'bg-red-500' : 'bg-green-500'} font-bold`}
+                >
+                  <TableCell className="text-center">{user.username}</TableCell>
+                  <TableCell className="text-center">{user.telephone}</TableCell>
+                  <TableCell className="text-center">{user.table}</TableCell>
+                  <TableCell className="text-center">{user.show.name}</TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex justify-center gap-2">
+                      {!user.deleted_at && (
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          aria-label="Excluir"
+                          className="p-2 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      )}
 
-                    {!user.deleted_at && (
-                      <button 
-                        onClick={() => handleDelete(user.id)} 
-                        aria-label="Excluir"
-                        className="p-2 text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    )}
-
-                    {user.deleted_at && (
-                      <button 
-                        onClick={() => handleRestore(user.id)} 
-                        aria-label="Restaurar"
-                        className="p-2 text-green-500 hover:text-green-700"
-                      >
-                        <RefreshCcw size={20} />
-                      </button>
-                    )}
-                  </div>
+                      {user.deleted_at && (
+                        <button
+                          onClick={() => handleRestore(user.id)}
+                          aria-label="Restaurar"
+                          className="p-2 text-green-500 hover:text-green-700"
+                        >
+                          <RefreshCcw size={20} />
+                        </button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : users?.data?.data ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Nenhum usuário encontrado.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
