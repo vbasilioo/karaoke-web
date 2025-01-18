@@ -22,6 +22,8 @@ import { useRestoreShow } from "@/hook/show/use-restore-show";
 import { useDestroyShow } from "@/hook/show/use-destroy-show";
 import { createShow } from "@/app/api/show/create-show";
 import { updateShow } from "@/app/api/show/update-show";
+import { IUser } from "@/interfaces/user";
+import { Skeleton } from "../ui/skeleton";
 
 export function Show() {
   const [session, setSession] = useState<any>(null);
@@ -221,38 +223,68 @@ export function Show() {
         </TableHeader>
         <TableBody>
           {shows?.data && shows.data.length > 0 ? (
-            shows.data.map((show) => (
-              <TableRow key={show.id} className={show.deleted_at ? 'bg-red-700' : 'bg-green-700'}>
+            shows.data.map((show: IShow) => (
+              <TableRow
+                key={show.id}
+                className={`text-center ${show.deleted_at ? 'bg-red-500' : 'bg-green-500'} font-bold`}
+              >
                 <TableCell className="text-center">{show.name}</TableCell>
                 <TableCell className="text-center">{formatFullDate(show.date_show)}</TableCell>
                 <TableCell className="text-center">{show.hour_start}</TableCell>
                 <TableCell className="text-center">{show.hour_end}</TableCell>
                 <TableCell className="text-center">{show.code_access}</TableCell>
-                <TableCell className="flex justify-center space-x-2">
-                  {show.deleted_at === null && (
-                    <Button onClick={() => handleEdit(show)} variant="link" size="icon">
-                      <Edit size={16} />
-                    </Button>
+                <TableCell className="flex justify-center gap-2">
+                  {!show.deleted_at && (
+                    <button
+                      onClick={() => handleDelete(show.id)}
+                      aria-label="Excluir"
+                      className="p-2 text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={20} />
+                    </button>
                   )}
-                  {show.deleted_at !== null && (
-                    <Button onClick={() => handleRestore(show.id)} variant="link" size="icon">
-                      <RefreshCcw size={16} />
-                    </Button>
-                  )}
-                  {show.deleted_at === null && (
-                    <Button onClick={() => handleDelete(show.id)} variant="link" size="icon">
-                      <Trash2 size={16} />
-                    </Button>
+
+                  {show.deleted_at && (
+                    <button
+                      onClick={() => handleRestore(show.id)}
+                      aria-label="Restaurar"
+                      className="p-2 text-green-500 hover:text-green-700"
+                    >
+                      <RefreshCcw size={20} />
+                    </button>
                   )}
                 </TableCell>
               </TableRow>
             ))
-          ) : (
+          ) : shows?.data ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-gray-500">
-                Nenhum show cadastrado ainda.
+              <TableCell colSpan={6} className="text-center">
+                Nenhum show encontrado.
               </TableCell>
             </TableRow>
+          ) : (
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              </TableRow>
+            ))
           )}
         </TableBody>
       </Table>
