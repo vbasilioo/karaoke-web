@@ -83,7 +83,7 @@ export default function Home() {
           </div>
           <Button asChild>
             <Link href="/auth/administrador-entrar" className="text-white bg-zinc-900 font-bold py-2 px-4 border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded-full">
-              Login
+              Painel Administrativo
             </Link>
           </Button>
         </div>
