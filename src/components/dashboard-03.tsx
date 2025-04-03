@@ -20,10 +20,8 @@ export default function Dashboard() {
   useEffect(() => {
     if(ws){
       ws.channel('add-music').listen('AddMusicEvent', (e: any) => {
-        if (e.orderQueue.length > 0) {
           const lastMusic = e.orderQueue[e.orderQueue.length - 1];
           toast.success(`A música "${lastMusic?.name}" foi adicionada.`, { id: 'newMusic' });
-        }
     
         queryClient.invalidateQueries({ queryKey: ['get-queue'] });
       });
