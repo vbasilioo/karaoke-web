@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 export async function destroyQueue(id: string, position: number){
     try{
-        const response = await api.delete<IDeleteQueue>('/queue/', {
+        const response = await api.delete<IDeleteQueue>('/queue/delete', {
             data: {
                 id: id,
                 position: position

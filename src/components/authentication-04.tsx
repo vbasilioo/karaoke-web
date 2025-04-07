@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { LoginFormData } from "@/interfaces/admin";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -44,61 +45,63 @@ export default function Dashboard() {
   }
 
   return (
-    <form onSubmit={handleSubmit(handleSignInCredentials)} className="bg-zinc-900 text-white min-h-screen flex items-center justify-center">
-      <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-        <div className="flex items-center justify-center py-12">
-          <div className="mx-auto grid w-[350px] gap-6">
-            <div className="grid gap-2 text-center">
-              <h1 className="text-3xl font-bold">Painel Administrativo</h1>
-              <p className="text-balance text-muted-foreground">
-                Entre com seu e-mail e sua senha.
-              </p>
-            </div>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  {...register("email")}
-                  className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  {...register("password")}
-                  className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded text-white font-bold" disabled={isSubmitting}>
-                Entrar
-              </Button>
-              <div className="flex items-center">
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Esqueceu sua senha?
-                </Link>
-              </div>
-            </div>
+    <div className="relative w-full h-screen">
+      <Image
+        src="/login-background.jpg"
+        alt="Image"
+        fill
+        className="absolute object-cover top-0 left-0 w-full h-full z-0"
+      />
+      <div
+        className="absolute top-4 left-4 z-10 p-2 bg-gradient-to-r from-pink-500 to-blue-500 text-white rounded-full shadow-md cursor-pointer transition duration-300 ease-in-out hover:from-pink-400 hover:to-blue-400"
+        onClick={() => router.back()}
+      >
+        <ChevronLeft />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="bg-zinc-900 bg-opacity-75 backdrop-blur-md p-8 rounded-lg shadow-lg w-[350px] text-white">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+            <p className="text-balance text-muted-foreground">
+              Entre com seu e-mail e sua senha.
+            </p>
           </div>
-        </div>
-        <div className="hidden bg-muted lg:block h-screen w-screen">
-          <Image
-            src="/login-background.jpg"
-            alt="Image"
-            width="1920"
-            height="1080"
-            className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-          />
+          <form onSubmit={handleSubmit(handleSignInCredentials)} className="space-y-4">
+            <div>
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                {...register("email")}
+                className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                {...register("password")}
+                className="bg-zinc-800 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <Button type="submit" className="w-full border-2 border-transparent bg-clip-padding bg-gradient-to-r from-pink-500 to-blue-500 rounded text-white font-bold" disabled={isSubmitting}>
+              Entrar
+            </Button>
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm underline"
+              >
+                Esqueceu sua senha?
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
-    </form>
+    </div>
+
   );
 }

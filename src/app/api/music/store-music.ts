@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export async function storeMusic(formData: FormData){
   try{
     const response = await api.post<IGetMusicProps>(
-      '/music/',
+      '/music/store',
       formData,
       {
         headers: {

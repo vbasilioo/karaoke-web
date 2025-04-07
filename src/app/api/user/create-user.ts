@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export async function createUser(formData: FormData) {
   try {
     const response = await api.post<IGetUser>(
-      '/user',
+      '/user/store',
       formData,
       {
         headers: {

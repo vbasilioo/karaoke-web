@@ -3,7 +3,7 @@ import { IGetQueue } from "@/interfaces/queue";
 
 export async function getQueue(adminId: string){
   try{
-    const response = await api.get<IGetQueue>('/queue/', {
+    const response = await api.get<IGetQueue>('/queue/index', {
       params: {
         admin_id: adminId
       }

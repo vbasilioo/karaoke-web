@@ -27,7 +27,7 @@ const useWebSocketHook = () => {
         const ws = new Echo({
           broadcaster: 'reverb',
           key: '8aufgskfspp0pybzycgg',
-          wsHost: 'localhost',
+          wsHost: '127.0.0.1',
           wsPort: '8080',
           wssPort: '8080',
           forceTLS: false,

@@ -113,7 +113,7 @@ export default function LoginForm() {
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">
-            <div className="flex justify-center mt-4">
+            {/* <div className="flex justify-center mt-4">
               <QRCode value={qrCodeData || "OpenMic"} size={128} />
             </div>
 
@@ -124,9 +124,8 @@ export default function LoginForm() {
                 onError={handleError}
                 onScan={handleScan}
               />
-            </div>
+            </div> */}
 
-            {isFieldsEnabled && (
               <div className="grid gap-2">
                 <Label htmlFor="username">Nome</Label>
                 <Input
@@ -151,8 +150,13 @@ export default function LoginForm() {
                   placeholder="(12) 99999-9999"
                   {...register("telephone")}
                 />
+                 <Input
+                  id="code_access"
+                  type="text"
+                  placeholder="(12) 99999-9999"
+                  {...register("code_access")}
+                />
               </div>
-            )}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full">Entrar</Button>
