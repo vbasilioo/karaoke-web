@@ -60,12 +60,10 @@ export function Sidebar() {
               </Link>
             </>
           )}
-          {!isAdmin && (
             <Link href="/musica" className={linkClasses("/musica")} onClick={() => handleClick("/musica")}>
               <Music2 className="h-4 w-4" />
               Músicas
             </Link>
-          )}
           {/*<Link href="/fila" className={linkClasses("/fila")} onClick={() => handleClick("/fila")}>
             <UserRoundPlus className="h-4 w-4" />
             Fila
