@@ -5,7 +5,7 @@ import { toast } from "sonner"
 export async function createShow(formData: FormData){
   try{
     const response = await api.post<ICreateShowProps>(
-      '/show',
+      '/show/store',
       formData,
       {
         headers: {

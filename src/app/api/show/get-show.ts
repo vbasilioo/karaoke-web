@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 export async function getShow(adminId: string){
   try{
-    const response = await api.get<IGetShowProps>('/show/', {
+    const response = await api.get<IGetShowProps>('/show', {
       params: {
         admin_id: adminId
       }

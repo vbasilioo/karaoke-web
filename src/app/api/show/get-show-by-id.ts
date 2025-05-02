@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 export async function getShowByCodeAccess(code_access: string){
   try{
-    const response = await api.get<IGetShowByCodeAccess>('/show/' + code_access);
+    const response = await api.get<IGetShowByCodeAccess>('/show' + code_access);
 
     return response.data;
   }catch(error: any){
