@@ -4,6 +4,7 @@ export interface IUser extends ITimestamps {
   username: string
   telephone: string
   table: number;
+  photo: string;
   show: IShow;
 }
 

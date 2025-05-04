@@ -152,7 +152,15 @@ export default function Dashboard() {
                 .map((item: IQueue) => (
                   <div key={item.id} className="flex items-center justify-between p-2 rounded bg-zinc-700">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-blue-300 mr-2" />
+                      {item.user.photo ? (
+                        <img
+                          src={item.user.photo}
+                          alt={item.user.username}
+                          className="h-10 w-10 rounded-full object-cover mr-2"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-blue-300 mr-2" />
+                      )}
                       <div className="flex flex-col text-white">
                         <span>{item.user.username}</span>
                         <span className="text-sm text-gray-400">Posição: {item.music.position}</span>

@@ -21,10 +21,9 @@ export function Sidebar() {
   };
 
   const linkClasses = (page: string) =>
-    `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-      activePage === page
-        ? "bg-zinc-800 text-white"
-        : "text-white hover:text-white hover:bg-zinc-700"
+    `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${activePage === page
+      ? "bg-zinc-800 text-white"
+      : "text-white hover:text-white hover:bg-zinc-700"
     }`;
 
   const isAdmin = session?.role === 'admin';
@@ -37,7 +36,7 @@ export function Sidebar() {
             <Mic2 className="h-6 w-6 text-white" />
             <span>OpenMic</span>
           </Link>
-          <button 
+          <button
             className="ml-auto md:hidden"
             onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -45,7 +44,7 @@ export function Sidebar() {
           </button>
         </div>
         <nav className={`grid items-start px-2 text-sm font-medium lg:px-4 ${isMobileMenuOpen ? "block" : "hidden"} md:block`}>
-          { isAdmin && (
+          {isAdmin && (
             <>
               <Link href="/dashboard" className={linkClasses("/dashboard")} onClick={() => handleClick("/dashboard")}>
                 <Home className="h-4 w-4" />
@@ -60,25 +59,25 @@ export function Sidebar() {
               </Link>
             </>
           )}
-            <Link href="/musica" className={linkClasses("/musica")} onClick={() => handleClick("/musica")}>
-              <Music2 className="h-4 w-4" />
-              Músicas
-            </Link>
-          {/*<Link href="/fila" className={linkClasses("/fila")} onClick={() => handleClick("/fila")}>
+          <Link href="/admin-musica" className={linkClasses("/musica")} onClick={() => handleClick("/musica")}>
+            <Music2 className="h-4 w-4" />
+            Músicas
+          </Link>
+          <Link href="/fila" className={linkClasses("/fila")} onClick={() => handleClick("/fila")}>
             <UserRoundPlus className="h-4 w-4" />
             Fila
-          </Link>*/}
-          { isAdmin && (
-          <Link href="/televisao" legacyBehavior>
-            <a
-              target="_blank"
-              className={linkClasses("/televisao")}
-              onClick={() => handleClick("/televisao")}
-            >
-              <Tv2 className="h-4 w-4" />
-              TV
-            </a>
           </Link>
+          {isAdmin && (
+            <Link href="/televisao" legacyBehavior>
+              <a
+                target="_blank"
+                className={linkClasses("/televisao")}
+                onClick={() => handleClick("/televisao")}
+              >
+                <Tv2 className="h-4 w-4" />
+                TV
+              </a>
+            </Link>
           )}
         </nav>
       </div>

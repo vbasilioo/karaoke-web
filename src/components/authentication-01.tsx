@@ -1,3 +1,5 @@
+"use client";
+
 import { createUser } from "@/app/api/user/create-user";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,16 +18,12 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useState, useRef } from "react";
-import QRCode from "react-qr-code";
-
-const QRScanner: any = require('react-qr-scanner');
 
 export default function LoginForm() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
-  const [isFieldsEnabled, setIsFieldsEnabled] = useState(false);
+  const [isFieldsEnabled, setIsFieldsEnabled] = useState(true); 
 
   const {
     register,
@@ -38,32 +36,27 @@ export default function LoginForm() {
 
   const { mutateAsync: storeUser } = useMutation({
     mutationFn: createUser,
-    mutationKey: ['create-user'],
+    mutationKey: ["create-user"],
     async onSuccess(data) {
       if (data) {
-        console.log('data data: ', data.data);
-        queryClient.invalidateQueries({ queryKey: ['create-user'] });
+        queryClient.invalidateQueries({ queryKey: ["create-user"] });
         router.push(`/musica?temporaryUser=${data.data.id}`);
         reset();
         setPhoto(null);
       }
     },
     async onError() {
-      toast.error('Falha ao criar um usuário temporário.');
-    }
+      toast.error("Falha ao criar um usuário temporário.");
+    },
   });
 
   const onSubmit = async (data: any) => {
     try {
       const formData = { ...data, photo };
-      const result = await storeUser(formData);
-      console.log(result);
+      await storeUser(formData);
     } catch (error: any) {
-      console.error(
-        'Error processing form:',
-        error.response?.data || error.message || error,
-      );
-      toast.error('Falha ao processar o formulário.');
+      console.error("Error processing form:", error);
+      toast.error("Falha ao processar o formulário.");
     }
   };
 
@@ -77,29 +70,20 @@ export default function LoginForm() {
 
   const capturePhoto = () => {
     if (videoRef.current) {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
-      canvas.getContext('2d')?.drawImage(videoRef.current, 0, 0);
-      const imageDataUrl = canvas.toDataURL('image/png');
+      canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
+      const imageDataUrl = canvas.toDataURL("image/png");
       setPhoto(imageDataUrl);
       setCameraActive(false);
 
       if (videoRef.current.srcObject) {
-        (videoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+        (videoRef.current.srcObject as MediaStream)
+          .getTracks()
+          .forEach((track) => track.stop());
       }
     }
-  };
-
-  const handleScan = (data: string | null) => {
-    if (data) {
-      setQrCodeData(data);
-      setIsFieldsEnabled(true);
-    }
-  };
-
-  const handleError = (err: any) => {
-    console.error(err);
   };
 
   return (
@@ -108,58 +92,111 @@ export default function LoginForm() {
         <CardHeader>
           <CardTitle className="text-2xl text-center">Entrar</CardTitle>
           <CardDescription className="text-center">
-            Leia o QR Code para liberar os campos de entrada.
+            Escolha um avatar ou tire uma foto para começar
           </CardDescription>
         </CardHeader>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">
-            {/* <div className="flex justify-center mt-4">
-              <QRCode value={qrCodeData || "OpenMic"} size={128} />
+            {/* Avatar Preview */}
+            <div className="flex flex-col items-center gap-2">
+              <Label className="text-sm text-muted-foreground">
+                Avatar selecionado:
+              </Label>
+              {photo ? (
+                <img
+                  src={photo}
+                  alt="Avatar"
+                  className="w-24 h-24 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gray-300" />
+              )}
             </div>
 
-            <div className="flex justify-center">
-              <QRScanner
-                delay={300}
-                style={{ width: "100%" }}
-                onError={handleError}
-                onScan={handleScan}
+            {/* Upload / Câmera / Avatares */}
+            <div className="grid gap-2">
+              <Button type="button" variant="outline" onClick={handleTakePhoto}>
+                Tirar Foto com a Câmera
+              </Button>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setPhoto(reader.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
               />
-            </div> */}
-
-              <div className="grid gap-2">
-                <Label htmlFor="username">Nome</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Thays"
-                  {...register("username", { required: "Nome é obrigatório" })}
-                />
-
-                <Label htmlFor="table">Mesa</Label>
-                <Input
-                  id="table"
-                  type="number"
-                  placeholder="10"
-                  {...register("table", { required: "Mesa é obrigatória" })}
-                />
-
-                <Label htmlFor="telephone">Telefone</Label>
-                <Input
-                  id="telephone"
-                  type="text"
-                  placeholder="(12) 99999-9999"
-                  {...register("telephone")}
-                />
-                 <Input
-                  id="code_access"
-                  type="text"
-                  placeholder="(12) 99999-9999"
-                  {...register("code_access")}
-                />
+              <Label className="text-sm mt-2">Ou escolha um personagem:</Label>
+              <div className="flex justify-between gap-2">
+                {["avatar1.png", "avatar2.png", "avatar3.png", "avatar4.png"].map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={`/avatars/${img}`}
+                    alt={`Avatar ${idx + 1}`}
+                    onClick={() => setPhoto(`/avatars/${img}`)}
+                    className={`w-16 h-16 rounded-full cursor-pointer border-2 ${photo === `/avatars/${img}`
+                        ? "border-cyan-600"
+                        : "border-transparent"
+                      }`}
+                  />
+                ))}
               </div>
+            </div>
+
+            {cameraActive && (
+              <div className="flex flex-col items-center gap-2">
+                <video ref={videoRef} autoPlay className="w-full rounded-md" />
+                <Button type="button" onClick={capturePhoto}>
+                  Capturar Foto
+                </Button>
+              </div>
+            )}
+
+            {/* Form fields */}
+            <div className="grid gap-2 mt-4">
+              <Label htmlFor="username">Nome</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Thays"
+                {...register("username", { required: "Nome é obrigatório" })}
+              />
+
+              <Label htmlFor="table">Mesa</Label>
+              <Input
+                id="table"
+                type="number"
+                placeholder="10"
+                {...register("table", { required: "Mesa é obrigatória" })}
+              />
+
+              <Label htmlFor="telephone">Telefone</Label>
+              <Input
+                id="telephone"
+                type="text"
+                placeholder="(12) 99999-9999"
+                {...register("telephone")}
+              />
+
+              <Label htmlFor="code_access">Código de Acesso</Label>
+              <Input
+                id="code_access"
+                type="text"
+                {...register("code_access")}
+              />
+            </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">Entrar</Button>
+            <Button type="submit" className="w-full">
+              Entrar
+            </Button>
           </CardFooter>
         </form>
       </Card>
