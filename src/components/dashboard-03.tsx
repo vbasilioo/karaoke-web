@@ -30,6 +30,10 @@ export default function Dashboard() {
 
   const firstMusicInQueue = getQueueData?.data?.[0]?.music ?? null;
 
+  // Estados para o timer
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [timer, setTimer] = useState(10);
+
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await getSession();
@@ -49,8 +53,23 @@ export default function Dashboard() {
     }
   }, [ws]);
 
+  // Timer de 10 segundos entre músicas
   useEffect(() => {
-    if (!firstMusicInQueue) return;
+    if (isWaiting) {
+      if (timer > 0) {
+        const interval = setInterval(() => {
+          setTimer((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(interval);
+      } else {
+        setIsWaiting(false);
+        handlePlayNextMusic();
+      }
+    }
+  }, [isWaiting, timer]);
+
+  useEffect(() => {
+    if (!firstMusicInQueue || isWaiting) return;
 
     const loadYouTubeAPI = () => {
       const scriptTag = document.createElement("script");
@@ -72,7 +91,8 @@ export default function Dashboard() {
         events: {
           onStateChange: (event: any) => {
             if (event.data === window.YT.PlayerState.ENDED) {
-              handlePlayNextMusic();
+              setIsWaiting(true);
+              setTimer(10);
             }
           },
         },
@@ -90,7 +110,7 @@ export default function Dashboard() {
         ytPlayerRef.current.destroy();
       }
     };
-  }, [firstMusicInQueue]);
+  }, [firstMusicInQueue, isWaiting]);
 
   const handlePlayNextMusic = () => {
     const firstQueueItem = getQueueData?.data?.[0];
@@ -138,7 +158,15 @@ export default function Dashboard() {
             {firstMusicInQueue && (
               <>
                 <h2 className="text-lg font-bold mb-2 text-white">{firstMusicInQueue.name}</h2>
-                <div ref={playerRef} className="w-full h-full" />
+                {isWaiting ? (
+                  <div className="flex items-center justify-center mb-4 h-[390px]">
+                    <span className="text-white text-2xl font-bold">
+                      Próxima música em {timer} segundo{timer !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <div ref={playerRef} className="w-full h-full" />
+                )}
               </>
             )}
           </div>
