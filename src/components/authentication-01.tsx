@@ -18,12 +18,14 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useState, useRef } from "react";
+import Image from "next/image";
 
 export default function LoginForm() {
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isFieldsEnabled, setIsFieldsEnabled] = useState(true); 
 
   const {
     register,
@@ -34,7 +36,7 @@ export default function LoginForm() {
 
   const router = useRouter();
 
-  const { mutateAsync: storeUser } = useMutation({
+  const { mutateAsync: storeUser, isPending } = useMutation({
     mutationFn: createUser,
     mutationKey: ["create-user"],
     async onSuccess(data) {
@@ -42,17 +44,32 @@ export default function LoginForm() {
         queryClient.invalidateQueries({ queryKey: ["create-user"] });
         router.push(`/musica?temporaryUser=${data.data.id}`);
         reset();
-        setPhoto(null);
+        setPhotoPreview(null);
+        setPhotoFile(null);
+        setSelectedAvatar(null);
       }
     },
-    async onError() {
-      toast.error("Falha ao criar um usuário temporário.");
+    async onError(error: any) {
+      console.error("Error creating user:", error);
+      toast.error(error?.response?.data?.message || "Falha ao criar um usuário temporário.");
     },
   });
 
   const onSubmit = async (data: any) => {
     try {
-      const formData = { ...data, photo };
+      const formData = new FormData();
+
+      formData.append("username", data.username);
+      formData.append("table", data.table);
+      formData.append("telephone", data.telephone || "");
+      formData.append("code_access", data.code_access);
+
+      if (photoFile) {
+        formData.append("photo", photoFile);
+      } else if (selectedAvatar) {
+        formData.append("avatarUrl", selectedAvatar);
+      }
+
       await storeUser(formData);
     } catch (error: any) {
       console.error("Error processing form:", error);
@@ -61,10 +78,16 @@ export default function LoginForm() {
   };
 
   const handleTakePhoto = async () => {
-    setCameraActive(true);
-    if (videoRef.current) {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
+    try {
+      setCameraActive(true);
+      if (videoRef.current) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      toast.error("Não foi possível acessar a câmera.");
+      setCameraActive(false);
     }
   };
 
@@ -73,9 +96,22 @@ export default function LoginForm() {
       const canvas = document.createElement("canvas");
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
-      canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
-      const imageDataUrl = canvas.toDataURL("image/png");
-      setPhoto(imageDataUrl);
+      const ctx = canvas.getContext("2d");
+
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0);
+        const imageDataUrl = canvas.toDataURL("image/png");
+        setPhotoPreview(imageDataUrl);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], "camera-photo.png", { type: "image/png" });
+            setPhotoFile(file);
+            setSelectedAvatar(null);
+          }
+        }, "image/png");
+      }
+
       setCameraActive(false);
 
       if (videoRef.current.srcObject) {
@@ -85,6 +121,34 @@ export default function LoginForm() {
       }
     }
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      setSelectedAvatar(null);
+    }
+  };
+
+  const selectAvatar = (avatarPath: string) => {
+    setSelectedAvatar(avatarPath);
+    setPhotoPreview(avatarPath);
+    setPhotoFile(null);
+  };
+
+  const avatars = [
+    "/character-1.jpeg",
+    "/character-2.jpeg",
+    "/character-3.jpeg",
+    "/character-4.jpeg"
+  ];
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -98,14 +162,13 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">
-            {/* Avatar Preview */}
             <div className="flex flex-col items-center gap-2">
               <Label className="text-sm text-muted-foreground">
                 Avatar selecionado:
               </Label>
-              {photo ? (
+              {photoPreview ? (
                 <img
-                  src={photo}
+                  src={photoPreview}
                   alt="Avatar"
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -114,7 +177,6 @@ export default function LoginForm() {
               )}
             </div>
 
-            {/* Upload / Câmera / Avatares */}
             <div className="grid gap-2">
               <Button type="button" variant="outline" onClick={handleTakePhoto}>
                 Tirar Foto com a Câmera
@@ -122,28 +184,19 @@ export default function LoginForm() {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setPhoto(reader.result as string);
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
+                onChange={handleFileChange}
               />
               <Label className="text-sm mt-2">Ou escolha um personagem:</Label>
               <div className="flex justify-between gap-2">
-                {["avatar1.png", "avatar2.png", "avatar3.png", "avatar4.png"].map((img, idx) => (
+                {avatars.map((avatar, idx) => (
                   <img
                     key={idx}
-                    src={`/avatars/${img}`}
+                    src={avatar}
                     alt={`Avatar ${idx + 1}`}
-                    onClick={() => setPhoto(`/avatars/${img}`)}
-                    className={`w-16 h-16 rounded-full cursor-pointer border-2 ${photo === `/avatars/${img}`
-                        ? "border-cyan-600"
-                        : "border-transparent"
+                    onClick={() => selectAvatar(avatar)}
+                    className={`w-16 h-16 rounded-full cursor-pointer border-2 ${selectedAvatar === avatar
+                      ? "border-cyan-600"
+                      : "border-transparent"
                       }`}
                   />
                 ))}
@@ -159,7 +212,6 @@ export default function LoginForm() {
               </div>
             )}
 
-            {/* Form fields */}
             <div className="grid gap-2 mt-4">
               <Label htmlFor="username">Nome</Label>
               <Input
@@ -168,6 +220,9 @@ export default function LoginForm() {
                 placeholder="Thays"
                 {...register("username", { required: "Nome é obrigatório" })}
               />
+              {errors.username && (
+                <p className="text-red-500 text-xs">{errors.username.message?.toString()}</p>
+              )}
 
               <Label htmlFor="table">Mesa</Label>
               <Input
@@ -176,6 +231,9 @@ export default function LoginForm() {
                 placeholder="10"
                 {...register("table", { required: "Mesa é obrigatória" })}
               />
+              {errors.table && (
+                <p className="text-red-500 text-xs">{errors.table.message?.toString()}</p>
+              )}
 
               <Label htmlFor="telephone">Telefone</Label>
               <Input
@@ -189,13 +247,16 @@ export default function LoginForm() {
               <Input
                 id="code_access"
                 type="text"
-                {...register("code_access")}
+                {...register("code_access", { required: "Código de acesso é obrigatório" })}
               />
+              {errors.code_access && (
+                <p className="text-red-500 text-xs">{errors.code_access.message?.toString()}</p>
+              )}
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Entrar
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Enviando..." : "Entrar"}
             </Button>
           </CardFooter>
         </form>
