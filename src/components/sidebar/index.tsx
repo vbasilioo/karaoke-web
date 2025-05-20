@@ -1,22 +1,41 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Home, Mic2, Tv2, UserCheck2, Music2, UserRoundPlus, MicIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export function Sidebar() {
   const [activePage, setActivePage] = useState("");
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isTemporaryUser, setIsTemporaryUser] = useState(false);
+  const [temporaryUserValue, setTemporaryUserValue] = useState("");
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const { pathname } = window.location;
+      const { pathname, search } = window.location;
       setActivePage(pathname);
+      const urlParams = new URLSearchParams(search);
+      const tempUser = urlParams.get("temporaryUser");
+      setIsTemporaryUser(!!tempUser);
+      setTemporaryUserValue(tempUser || "");
     }
   }, []);
 
   const handleClick = (page: string) => {
     setActivePage(page);
+    setMobileMenuOpen(false);
+  };
+
+  // Função para navegar mantendo o temporaryUser na URL, se existir
+  const navigateWithTemporaryUser = (basePath: string) => {
+    let url = basePath;
+    if (isTemporaryUser && temporaryUserValue) {
+      url = `${basePath}?temporaryUser=${temporaryUserValue}`;
+    }
+    router.push(url);
+    setActivePage(basePath);
     setMobileMenuOpen(false);
   };
 
@@ -26,7 +45,7 @@ export function Sidebar() {
       : "text-white hover:text-white hover:bg-zinc-700"
     }`;
 
-  const isAdmin = session?.role === 'admin';
+  const showAdminOptions = session?.role === 'admin' && !isTemporaryUser;
 
   return (
     <div className={`border-r bg-zinc-900 ${isMobileMenuOpen ? "block md:hidden" : "hidden"} md:block`}>
@@ -44,7 +63,7 @@ export function Sidebar() {
           </button>
         </div>
         <nav className={`grid items-start px-2 text-sm font-medium lg:px-4 ${isMobileMenuOpen ? "block" : "hidden"} md:block`}>
-          {isAdmin && (
+          {showAdminOptions && (
             <>
               <Link href="/dashboard" className={linkClasses("/dashboard")} onClick={() => handleClick("/dashboard")}>
                 <Home className="h-4 w-4" />
@@ -53,21 +72,30 @@ export function Sidebar() {
               <Link href="/show" className={linkClasses("/show")} onClick={() => handleClick("/show")}>
                 <MicIcon className="h-4 w-4" />
                 Shows
-              </Link><Link href="/usuarios" className={linkClasses("/usuarios")} onClick={() => handleClick("/usuarios")}>
+              </Link>
+              <Link href="/usuarios" className={linkClasses("/usuarios")} onClick={() => handleClick("/usuarios")}>
                 <UserCheck2 className="h-4 w-4" />
                 Usuários
               </Link>
             </>
           )}
-          <Link href="/admin-musica" className={linkClasses("/musica")} onClick={() => handleClick("/musica")}>
+          <button
+            className={linkClasses("/admin-musica")}
+            onClick={() => navigateWithTemporaryUser("/admin-musica")}
+            style={{ textAlign: "left" }}
+          >
             <Music2 className="h-4 w-4" />
             Músicas
-          </Link>
-          <Link href="/fila" className={linkClasses("/fila")} onClick={() => handleClick("/fila")}>
+          </button>
+          <button
+            className={linkClasses("/fila")}
+            onClick={() => navigateWithTemporaryUser("/fila")}
+            style={{ textAlign: "left" }}
+          >
             <UserRoundPlus className="h-4 w-4" />
             Fila
-          </Link>
-          {isAdmin && (
+          </button>
+          {showAdminOptions && (
             <Link href="/televisao" legacyBehavior>
               <a
                 target="_blank"

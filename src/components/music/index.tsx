@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useSearchMusic } from "@/hook/music/use-search-music";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Loading } from "../global/loading";
-import { Error } from "../global/error";
 import { useGetMe } from "@/hook/user/use-get-me";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
@@ -64,7 +63,7 @@ export function Music() {
 
   const search = z.string().parse(searchParams.get("search") ?? "");
 
-  const { data: musics, isLoading, isError } = useSearchMusic({
+  const { data: musics } = useSearchMusic({
     search,
     page: 1,
     per_page: 9,
