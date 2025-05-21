@@ -30,7 +30,6 @@ export default function Dashboard() {
 
   const firstMusicInQueue = getQueueData?.data?.[0]?.music ?? null;
 
-  // Estados para o timer
   const [isWaiting, setIsWaiting] = useState(false);
   const [timer, setTimer] = useState(10);
 
@@ -53,7 +52,6 @@ export default function Dashboard() {
     }
   }, [ws]);
 
-  // Timer de 10 segundos entre músicas
   useEffect(() => {
     if (isWaiting) {
       if (timer > 0) {

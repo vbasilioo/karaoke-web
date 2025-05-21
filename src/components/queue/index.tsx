@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useGetQueue } from "@/hook/queue/use-get-queue";
 import { useDestroyQueue } from "@/hook/queue/use-destroy-queue";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
 export function Queue() {
-  const [session, setSession] = useState<any>(null);
-
+  const { data: session } = useSession();
+  const adminId = session?.admin?.id ?? '';
+  const [sessionData, setSession] = useState<any>(null);
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await getSession();
@@ -18,7 +19,7 @@ export function Queue() {
     fetchSession();
   }, []);
 
-  const { data, refetch } = useGetQueue(session?.admin?.id ?? '');
+  const { data, refetch } = useGetQueue(adminId);
   const { mutate: removeFromQueue } = useDestroyQueue();
 
   const sortedQueue = data?.data

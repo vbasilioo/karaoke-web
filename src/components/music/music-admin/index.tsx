@@ -27,6 +27,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/global/loading";
+import { useSession } from "next-auth/react";
 
 interface MusicSnippet {
     title: string;
@@ -70,7 +71,8 @@ export function MusicAdmin() {
 
     const router = useRouter();
     const searchParams = useSearchParams();
-    const adminId = searchParams.get("temporaryUser") ?? "";
+    const { data: session } = useSession();
+    const adminId = session?.admin.id ?? "";
 
     const search = z.string().parse(searchParams.get("search") ?? "");
 

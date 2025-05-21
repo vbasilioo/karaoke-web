@@ -10,7 +10,6 @@ import { Loading } from "../global/loading";
 import { useGetMe } from "@/hook/user/use-get-me";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
-import { queryClient } from "@/lib/react-query";
 import { adjustQueue } from "@/app/api/music/adjust-queue";
 import { useMutation } from "@tanstack/react-query";
 import { storeMusic } from "@/app/api/music/store-music";
@@ -24,6 +23,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
+import { useGetQueue } from "@/hook/queue/use-get-queue";
+import { useSession } from "next-auth/react";
 
 interface MusicSnippet {
   title: string;
@@ -59,7 +60,9 @@ export function Music() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = searchParams.get("temporaryUser");
+  const userId = searchParams.get("temporaryUser") ?? "";
+  const { data: session } = useSession();
+  const adminId = session?.admin?.id ?? "";
 
   const search = z.string().parse(searchParams.get("search") ?? "");
 
@@ -69,7 +72,9 @@ export function Music() {
     per_page: 9,
   });
 
-  const { data: userme, isLoading: isUserLoading } = useGetMe(userId ?? "");
+  const { data: userme, isLoading: isUserLoading } = useGetMe(userId);
+
+  const { refetch: refetchQueue } = useGetQueue(adminId);
 
   const {
     register,
@@ -83,7 +88,7 @@ export function Music() {
     mutationKey: ["store-music"],
     async onSuccess() {
       await adjustQueue();
-      queryClient.invalidateQueries({ queryKey: ["store-music", "get-queue"] });
+      await refetchQueue();
       reset();
     },
     onError: () => {
@@ -127,7 +132,7 @@ export function Music() {
 
     const userId = userData.id;
     const showId = userData.show_id;
-
+    console.log("session", adminId)
     const musicData = new FormData();
     musicData.append("name", selectedMusic.snippet.title);
     musicData.append("description", selectedMusic.snippet.description);
