@@ -40,6 +40,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -72,7 +73,28 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: none !important;
+  color: #000 !important;
+  opacity: 1 !important;
+}
+
+/* Firefox */
+input[type="date"],
+input[type="time"] {
+  color-scheme: light;
+}
+
+/* Remove o background branco do input no dark mode, mantendo o ícone visível */
+.dark input[type="date"],
+.dark input[type="time"] {
+  background-color: #fff !important;
+  color: #000 !important;
 }

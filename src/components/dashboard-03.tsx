@@ -29,9 +29,12 @@ export default function Dashboard() {
   const ws = useWebSocketHook();
 
   const firstMusicInQueue = getQueueData?.data?.[0]?.music ?? null;
-
+  console.log(getQueueData);
   const [isWaiting, setIsWaiting] = useState(false);
   const [timer, setTimer] = useState(10);
+
+  // Estado para controlar o vídeo que está tocando e evitar reinício desnecessário
+  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -66,8 +69,15 @@ export default function Dashboard() {
     }
   }, [isWaiting, timer]);
 
+  // Atualiza currentVideoId somente quando a música atual mudar
   useEffect(() => {
-    if (!firstMusicInQueue || isWaiting) return;
+    if (firstMusicInQueue && firstMusicInQueue.video_id !== currentVideoId) {
+      setCurrentVideoId(firstMusicInQueue.video_id);
+    }
+  }, [firstMusicInQueue, currentVideoId]);
+
+  useEffect(() => {
+    if (!currentVideoId || isWaiting) return;
 
     const loadYouTubeAPI = () => {
       const scriptTag = document.createElement("script");
@@ -81,7 +91,7 @@ export default function Dashboard() {
       ytPlayerRef.current = new window.YT.Player(playerRef.current, {
         height: "390",
         width: "640",
-        videoId: firstMusicInQueue.video_id,
+        videoId: currentVideoId,
         playerVars: {
           autoplay: 1,
           controls: 1,
@@ -108,7 +118,7 @@ export default function Dashboard() {
         ytPlayerRef.current.destroy();
       }
     };
-  }, [firstMusicInQueue, isWaiting]);
+  }, [currentVideoId, isWaiting]);
 
   const handlePlayNextMusic = () => {
     const firstQueueItem = getQueueData?.data?.[0];
@@ -189,7 +199,7 @@ export default function Dashboard() {
                       )}
                       <div className="flex flex-col text-white">
                         <span>{item.user.username}</span>
-                        <span className="text-sm text-gray-400">Posição: {item.music.position}</span>
+                        <span className="text-sm max-w-96 truncate text-gray-400">Música: {item.music.name}</span>
                       </div>
                     </div>
                     <button

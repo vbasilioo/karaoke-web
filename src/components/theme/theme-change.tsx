@@ -7,7 +7,7 @@ import {
 import { Moon, Sun } from 'lucide-react'
 
 const LightTheme = () => {
-  return <Sun className="block text-gray-900 dark:text-white" size={20} />
+  return <Sun className="block text-white" size={20} />
 }
 
 const DarkTheme = () => {
