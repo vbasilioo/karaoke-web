@@ -181,33 +181,35 @@ export function Music() {
 
       {musics?.data && musics.data.items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {musics.data.items.map((music, index) => (
-            <div
-              key={index}
-              className="border rounded-lg p-4 flex flex-col items-center text-center"
-            >
-              <Image
-                src={music.snippet.thumbnails.high.url ?? music.snippet.thumbnails.default.url}
-                alt={music.snippet.title}
-                width={320}
-                height={200}
-                className="mb-2 w-full"
-              />
-              <h3 className="text-lg font-semibold">{music.snippet.title}</h3>
-              <p className="text-gray-500 text-sm mt-1">
-                Descrição: <span>{music.snippet.description}</span>
-              </p>
-              <p className="text-gray-500 text-sm mt-1">
-                Canal: <span>{music.snippet.channelTitle}</span>
-              </p>
-              <Button
-                className="mt-2 bg-cyan-900 w-full font-bold dark:font-bold dark:text-white"
-                onClick={() => handleCantarClick(music)}
+          {musics.data.items
+            .filter((music) => music.snippet.description?.trim()) // Filtra apenas os vídeos com descrição
+            .map((music, index) => (
+              <div
+                key={index}
+                className="border rounded-lg p-4 flex flex-col items-center text-center"
               >
-                Cantar
-              </Button>
-            </div>
-          ))}
+                <Image
+                  src={music.snippet.thumbnails.high.url ?? music.snippet.thumbnails.default.url}
+                  alt={music.snippet.title}
+                  width={320}
+                  height={200}
+                  className="mb-2 w-full"
+                />
+                <h3 className="text-lg font-semibold">{music.snippet.title}</h3>
+                <p className="text-gray-500 text-sm mt-1">
+                  Descrição: <span>{music.snippet.description}</span>
+                </p>
+                <p className="text-gray-500 text-sm mt-1">
+                  Canal: <span>{music.snippet.channelTitle}</span>
+                </p>
+                <Button
+                  className="mt-2 bg-cyan-900 w-full font-bold dark:font-bold dark:text-white"
+                  onClick={() => handleCantarClick(music)}
+                >
+                  Cantar
+                </Button>
+              </div>
+            ))}
         </div>
       ) : (
         <p className="text-center text-gray-600">Nenhuma música pesquisada.</p>

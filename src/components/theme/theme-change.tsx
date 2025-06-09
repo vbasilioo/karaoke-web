@@ -6,22 +6,28 @@ import {
 } from '@/components/ui/popover'
 import { Moon, Sun } from 'lucide-react'
 
-const LightTheme = () => {
-  return <Sun className="block text-white" size={20} />
-}
+const LightTheme = ({ context }: { context: 'navbar' | 'popover' }) => {
+  return (
+    <Sun
+      className={`block ${context === 'navbar' ? 'text-white' : 'text-gray-900 dark:text-white'
+        }`}
+      size={20}
+    />
+  );
+};
 
 const DarkTheme = () => {
   return <Moon className="block text-gray-900 dark:text-white" size={20} />
 }
 
 export const ThemeChanger = () => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button className="border-none bg-transparent p-2 focus:outline-none">
-          {theme === 'light' ? <LightTheme /> : <DarkTheme />}
+          {theme === 'light' ? <LightTheme context="navbar" /> : <DarkTheme />}
         </button>
       </PopoverTrigger>
       <PopoverContent className="flex max-w-36 flex-col gap-3">
@@ -30,7 +36,7 @@ export const ThemeChanger = () => {
           disabled={theme === 'light'}
           onClick={() => setTheme('light')}
         >
-          <LightTheme />
+          <LightTheme context="popover" />
           <span className="text-gray-900 dark:text-white">Claro</span>
         </button>
         <button
@@ -43,5 +49,5 @@ export const ThemeChanger = () => {
         </button>
       </PopoverContent>
     </Popover>
-  )
-}
+  );
+};

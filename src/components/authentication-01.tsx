@@ -178,9 +178,6 @@ export default function LoginForm() {
             </div>
 
             <div className="grid gap-2">
-              <Button type="button" variant="outline" onClick={handleTakePhoto}>
-                Tirar Foto com a Câmera
-              </Button>
               <Input
                 type="file"
                 accept="image/*"
@@ -217,7 +214,7 @@ export default function LoginForm() {
               <Input
                 id="username"
                 type="text"
-                placeholder="Thays"
+                placeholder="Insira seu nome"
                 {...register("username", { required: "Nome é obrigatório" })}
               />
               {errors.username && (
@@ -228,7 +225,7 @@ export default function LoginForm() {
               <Input
                 id="table"
                 type="number"
-                placeholder="10"
+                placeholder="Insira o número da mesa"
                 {...register("table", { required: "Mesa é obrigatória" })}
               />
               {errors.table && (
@@ -247,6 +244,7 @@ export default function LoginForm() {
               <Input
                 id="code_access"
                 type="text"
+                placeholder="Código de acesso"
                 {...register("code_access", { required: "Código de acesso é obrigatório" })}
               />
               {errors.code_access && (

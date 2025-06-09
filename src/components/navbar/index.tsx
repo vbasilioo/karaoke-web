@@ -112,11 +112,7 @@ export function Navbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Configurações</DropdownMenuItem>
-            <DropdownMenuItem>Suporte</DropdownMenuItem>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuLabel>Minha conta</DropdownMenuLabel> */}
             <DropdownMenuItem onClick={() => signOut({ callbackUrl: "http://localhost:3000" })}>Sair</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -32,10 +32,10 @@ export default function Dashboard() {
 
   const sortedQueue = getQueueData?.data
     ? [...getQueueData.data]
-        .filter(item => item.music && item.music.position !== null)
-        .sort((a, b) => a.music.position - b.music.position)
+      .filter(item => item.music && item.music.position !== null)
+      .sort((a, b) => a.music.position - b.music.position)
     : [];
-  
+
   const firstMusicInQueue = sortedQueue[0]?.music ?? null;
   const currentQueueId = sortedQueue[0]?.id ?? null;
 
@@ -70,7 +70,7 @@ export default function Dashboard() {
         return () => clearInterval(interval);
       } else {
         setIsWaiting(false);
-        setTimer(10); 
+        setTimer(10);
         handlePlayNextMusic();
       }
     }
@@ -80,7 +80,7 @@ export default function Dashboard() {
     if (currentQueueId !== currentQueueIdRef.current && !isWaiting) {
       console.log("ID da fila mudou:", currentQueueId, "anterior:", currentQueueIdRef.current);
       currentQueueIdRef.current = currentQueueId;
-      
+
       if (playerInitializedRef.current && ytPlayerRef.current && firstMusicInQueue) {
         console.log("Carregando novo vídeo:", firstMusicInQueue.video_id);
         ytPlayerRef.current.loadVideoById(firstMusicInQueue.video_id);
@@ -116,12 +116,9 @@ export default function Dashboard() {
           onReady: () => {
             playerInitializedRef.current = true;
             currentQueueIdRef.current = currentQueueId;
-            console.log("Player inicializado com vídeo:", firstMusicInQueue.video_id);
           },
           onStateChange: (event: any) => {
-            console.log("Estado do player mudou:", event.data);
             if (event.data === window.YT.PlayerState.ENDED) {
-              console.log("Vídeo terminou, iniciando timer de espera");
               setIsWaiting(true);
               setTimer(10);
             }
@@ -216,7 +213,7 @@ export default function Dashboard() {
 
           <div className="flex flex-col rounded-xl bg-zinc-800 p-4 lg:col-span-1">
             <h3 className="text-lg font-bold mb-2 text-white">Fila de Pessoas</h3>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2 overflow-y-auto max-h-[400px]">
               {sortedQueue.map((item: IQueue) => (
                 <div key={item.id} className="flex items-center justify-between p-2 rounded bg-zinc-700">
                   <div className="flex items-center">

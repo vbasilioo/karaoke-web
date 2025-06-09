@@ -226,7 +226,7 @@ export function Show() {
             shows.data.map((show: IShow) => (
               <TableRow
                 key={show.id}
-                className={`text-center ${show.deleted_at ? 'bg-red-500' : 'bg-green-500'} font-bold dark:bg-muted/50 dark:hover:bg-green-500`}
+                className={`text-center ${show.deleted_at ? 'bg-red-500' : 'bg-green-500'} font-bold dark:bg-green-500 dark:hover:bg-muted/50`}
               >
                 <TableCell className="text-center">{show.name}</TableCell>  
                 <TableCell className="text-center">{formatFullDate(show.date_show)}</TableCell>
